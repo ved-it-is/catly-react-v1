@@ -1,24 +1,35 @@
 import React, { useState } from "react";
-import { login } from "../auth/auth";
+import { supabase } from "../auth/supabaseClient";
 
 export default function LoginPage({ onLogin, onSignup }) {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-
     setError("");
+    setLoading(true);
 
-    const result = login(userId, password);
+    // Format username to match Supabase email auth
+    const email = userId.includes("@") ? userId : `${userId}@catly.app`;
 
-    if (!result.success) {
-      setError(result.message);
+    const { data, error: loginError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (loginError) {
+      setError(loginError.message);
+      setLoading(false);
       return;
     }
 
-    onLogin(result.user);
+    setLoading(false);
+    if (onLogin) {
+      onLogin(data.user);
+    }
   }
 
   return (
@@ -49,6 +60,7 @@ export default function LoginPage({ onLogin, onSignup }) {
             value={userId}
             onChange={(e) => setUserId(e.target.value)}
             autoComplete="username"
+            required
           />
 
           <label>Password</label>
@@ -59,6 +71,7 @@ export default function LoginPage({ onLogin, onSignup }) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="current-password"
+            required
           />
 
           {error && (
@@ -67,8 +80,8 @@ export default function LoginPage({ onLogin, onSignup }) {
             </div>
           )}
 
-          <button type="submit" className="auth-button">
-            SIGN IN
+          <button type="submit" className="auth-button" disabled={loading}>
+            {loading ? "SIGNING IN..." : "SIGN IN"}
           </button>
 
         </form>
@@ -80,6 +93,7 @@ export default function LoginPage({ onLogin, onSignup }) {
         <button
           className="auth-secondary-button"
           onClick={onSignup}
+          type="button"
         >
           CREATE ACCOUNT
         </button>

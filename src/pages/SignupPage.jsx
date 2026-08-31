@@ -1,15 +1,15 @@
 import React, { useState } from "react";
-import { signup } from "../auth/auth";
+import { supabase } from "../auth/supabaseClient";
 
 export default function SignupPage({ onSignup, onLogin }) {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-
     setError("");
 
     if (password !== confirmPassword) {
@@ -17,14 +17,34 @@ export default function SignupPage({ onSignup, onLogin }) {
       return;
     }
 
-    const result = signup(userId, password);
+    setLoading(true);
 
-    if (!result.success) {
-      setError(result.message);
+    // Format username to match Supabase email requirement
+    const email = userId.includes("@") ? userId : `${userId}@catly.app`;
+
+    const { data, error: signUpError } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    if (signUpError) {
+      setError(signUpError.message);
+      setLoading(false);
       return;
     }
 
-    onSignup(result.user);
+    if (data?.user) {
+      // Create profile row in user_profiles table
+      await supabase.from("user_profiles").insert([
+        { id: data.user.id, email: data.user.email }
+      ]);
+
+      if (onSignup) {
+        onSignup(data.user);
+      }
+    }
+
+    setLoading(false);
   }
 
   return (
@@ -54,6 +74,7 @@ export default function SignupPage({ onSignup, onLogin }) {
             placeholder="Your CAT User ID"
             value={userId}
             onChange={(e) => setUserId(e.target.value)}
+            required
           />
 
           <label>Create Password</label>
@@ -63,6 +84,7 @@ export default function SignupPage({ onSignup, onLogin }) {
             placeholder="At least 6 characters"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
           />
 
           <label>Confirm Password</label>
@@ -72,6 +94,7 @@ export default function SignupPage({ onSignup, onLogin }) {
             placeholder="Repeat your password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
+            required
           />
 
           {error && (
@@ -80,8 +103,8 @@ export default function SignupPage({ onSignup, onLogin }) {
             </div>
           )}
 
-          <button type="submit" className="auth-button">
-            CREATE ACCOUNT
+          <button type="submit" className="auth-button" disabled={loading}>
+            {loading ? "CREATING..." : "CREATE ACCOUNT"}
           </button>
 
         </form>
@@ -93,6 +116,7 @@ export default function SignupPage({ onSignup, onLogin }) {
         <button
           className="auth-secondary-button"
           onClick={onLogin}
+          type="button"
         >
           SIGN IN
         </button>
