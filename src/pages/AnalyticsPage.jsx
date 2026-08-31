@@ -204,7 +204,7 @@ export default function AnalyticsPage() {
 
   return (
 
-    <div className="page-content analytics-page">
+    <div className="analytics-page">
 
 
       {/* ===================================================
