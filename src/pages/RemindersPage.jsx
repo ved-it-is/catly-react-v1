@@ -8,6 +8,10 @@ const REMINDER_COLORS = [
   "amber",
 ];
 
+function getToday() {
+  return new Date().toISOString().split("T")[0];
+}
+
 function getReminderKey(user) {
   const userId = user?.userId || "guest";
 
@@ -73,6 +77,9 @@ export default function RemindersPage({ user }) {
   const [color, setColor] =
     useState("purple");
 
+  const [formError, setFormError] =
+    useState("");
+
 
   useEffect(() => {
 
@@ -105,6 +112,7 @@ export default function RemindersPage({ user }) {
     setDescription("");
     setDate("");
     setColor("purple");
+    setFormError("");
 
     setEditingId(null);
 
@@ -148,6 +156,11 @@ export default function RemindersPage({ user }) {
     event.preventDefault();
 
     if (!title.trim()) return;
+
+    if (date && date < getToday()) {
+      setFormError("Choose today or a future date for this reminder.");
+      return;
+    }
 
 
     if (editingId) {
@@ -211,7 +224,7 @@ export default function RemindersPage({ user }) {
 
   return (
 
-    <div className="page-content narrow">
+    <div className="narrow reminders-page">
 
       <div className="reminders-header">
 
@@ -442,12 +455,17 @@ export default function RemindersPage({ user }) {
                 <input
                   type="date"
                   value={date}
+                  min={getToday()}
                   onChange={(event) =>
-                    setDate(event.target.value)
+                    { setDate(event.target.value); setFormError(""); }
                   }
                 />
 
               </label>
+
+              {formError && (
+                <p className="form-error" role="alert">{formError}</p>
+              )}
 
 
               <label>

@@ -163,7 +163,7 @@ function App() {
           </button>
         </div>
 
-        <div className="page-content">
+        <div className={`page-content ${activePage === "countdown" ? "page-content--full-bleed" : ""}`}>
           {renderPage()}
         </div>
 

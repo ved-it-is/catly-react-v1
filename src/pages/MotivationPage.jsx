@@ -8,7 +8,7 @@ const messages = [
 
 export default function MotivationPage({goMock}) {
   const [index,setIndex]=useState(0);
-  useEffect(()=>{const id=setInterval(()=>setIndex(i=>(i+1)%messages.length),5000);return()=>clearInterval(id)},[]);
+  useEffect(()=>{const id=setInterval(()=>setIndex(i=>(i+1)%messages.length),9000);return()=>clearInterval(id)},[]);
   const m=messages[index];
   return <div className="motivation-page">
     <div className="eyebrow">A NOTE FOR TODAY</div>

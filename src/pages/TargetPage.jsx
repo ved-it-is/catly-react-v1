@@ -104,7 +104,7 @@ export default function TargetPage({ user }) {
   }
 
   return (
-    <div className="page-content narrow target-page">
+    <div className="narrow target-page">
       <div className="target-header">
         <div className="section-title xl">
           My Target
@@ -122,30 +122,6 @@ export default function TargetPage({ user }) {
         <div className="target-glow target-glow-three" />
 
         <div className="target-content">
-          <div className="target-slider-area">
-            <div className="target-number">
-              {target.toFixed(1)}
-              <span>%ile</span>
-            </div>
-
-            <input
-              className="range target-range"
-              type="range"
-              min="50"
-              max="99.9"
-              step=".1"
-              value={target}
-              onChange={(event) =>
-                setTarget(Number(event.target.value))
-              }
-            />
-
-            <div className="range-labels">
-              <span>50</span>
-              <span>99.9</span>
-            </div>
-          </div>
-
           <div className="result-card target-result-card">
             <div className="warning">
               SIMULATION — NOT OFFICIAL
@@ -162,6 +138,33 @@ export default function TargetPage({ user }) {
             <div className="muted historical-range">
               Illustrative historical score range:{" "}
               <b>{estimate}</b>
+            </div>
+          </div>
+
+          <div className="target-slider-area">
+            <div className="eyebrow">ADJUST YOUR TARGET</div>
+
+            <div className="target-number">
+              {target.toFixed(1)}
+              <span>%ile</span>
+            </div>
+
+            <input
+              className="range target-range"
+              type="range"
+              min="50"
+              max="100"
+              step=".1"
+              value={target}
+              onChange={(event) =>
+                setTarget(Number(event.target.value))
+              }
+              aria-label="Target percentile"
+            />
+
+            <div className="range-labels">
+              <span>50</span>
+              <span>100</span>
             </div>
           </div>
         </div>
@@ -181,12 +184,6 @@ export default function TargetPage({ user }) {
             </div>
           </div>
 
-          <button
-            className="readiness-reset"
-            onClick={resetReadiness}
-          >
-            Reset check-in
-          </button>
         </div>
 
         <div className="readiness-summary">
@@ -247,6 +244,15 @@ export default function TargetPage({ user }) {
           100% means your logged preparation matches CATLY’s
           high-readiness benchmark. It does not guarantee a
           percentile or CAT score.
+        </div>
+
+        <div className="readiness-actions">
+          <button
+            className="readiness-reset"
+            onClick={resetReadiness}
+          >
+            Reset check-in
+          </button>
         </div>
 
         <div className="readiness-topic-sections">
