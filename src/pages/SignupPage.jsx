@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { supabase } from "../auth/supabaseClient";
+import { Eye, EyeOff, LockKeyhole, Mail, Sparkles } from "lucide-react";
 
 export default function SignupPage({ onSignup, onLogin }) {
   const [userId, setUserId] = useState("");
@@ -7,6 +8,7 @@ export default function SignupPage({ onSignup, onLogin }) {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -49,53 +51,33 @@ export default function SignupPage({ onSignup, onLogin }) {
 
   return (
     <div className="auth-page">
-      <div className="auth-card">
+      <div className="auth-shell">
+        <aside className="auth-showcase" aria-hidden="true">
+          <div className="auth-logo">CAT<span>LY</span></div>
+          <div className="auth-showcase-copy">
+            <span className="auth-kicker"><Sparkles size={14} /> CAT 2026 command centre</span>
+            <h2>Your best prep<br />starts here.</h2>
+            <p>Build a calmer, more intentional path to your CAT goal—one day at a time.</p>
+          </div>
+          <div className="auth-quote">One account. Your entire CAT journey.</div>
+        </aside>
 
-        <div className="auth-logo">
-          CAT<span>LY</span>
-        </div>
-
-        <p className="auth-subtitle">
-          Your CAT 2026 command centre.
-        </p>
-
-        <h1>Create your account.</h1>
-
-        <p className="auth-description">
-          One account. Your entire CAT journey.
-        </p>
+        <div className="auth-card">
+          <div className="auth-mobile-brand auth-logo">CAT<span>LY</span></div>
+          <span className="auth-kicker"><Sparkles size={14} /> Start your journey</span>
+          <h1>Create your account.</h1>
+          <p className="auth-description">Your personalised CAT command centre is a few details away.</p>
 
         <form onSubmit={handleSubmit}>
 
-          <label>CAT User ID</label>
+          <label htmlFor="signup-user-id">CAT User ID</label>
+          <div className="auth-input-wrap"><Mail size={18} aria-hidden="true" /><input id="signup-user-id" type="text" placeholder="Your CAT User ID" value={userId} onChange={(e) => setUserId(e.target.value)} autoComplete="username" required /></div>
 
-          <input
-            type="text"
-            placeholder="Your CAT User ID"
-            value={userId}
-            onChange={(e) => setUserId(e.target.value)}
-            required
-          />
+          <label htmlFor="signup-password">Create password</label>
+          <div className="auth-input-wrap"><LockKeyhole size={18} aria-hidden="true" /><input id="signup-password" type={showPassword ? "text" : "password"} placeholder="At least 6 characters" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" required /><button className="password-toggle" type="button" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? "Hide password" : "Show password"}>{showPassword ? <EyeOff size={18} /> : <Eye size={18} />}</button></div>
 
-          <label>Create Password</label>
-
-          <input
-            type="password"
-            placeholder="At least 6 characters"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-
-          <label>Confirm Password</label>
-
-          <input
-            type="password"
-            placeholder="Repeat your password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-          />
+          <label htmlFor="signup-confirm-password">Confirm password</label>
+          <div className="auth-input-wrap"><LockKeyhole size={18} aria-hidden="true" /><input id="signup-confirm-password" type={showPassword ? "text" : "password"} placeholder="Repeat your password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} autoComplete="new-password" required /></div>
 
           {error && (
             <div className="auth-error">
@@ -121,6 +103,7 @@ export default function SignupPage({ onSignup, onLogin }) {
           SIGN IN
         </button>
 
+        </div>
       </div>
     </div>
   );

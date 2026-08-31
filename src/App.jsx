@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Menu } from "lucide-react";
 
 import Sidebar from "./components/Sidebar";
 import DashboardPage from "./pages/DashboardPage";
@@ -24,6 +25,7 @@ function App() {
 
   const [authPage, setAuthPage] = useState("login");
   const [activePage, setActivePage] = useState("dashboard");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   function handleLogin(user) {
     setCurrentUser(user);
@@ -39,6 +41,11 @@ function App() {
     logout();
     setCurrentUser(null);
     setAuthPage("login");
+  }
+
+  function handlePageChange(page) {
+    setActivePage(page);
+    setMobileMenuOpen(false);
   }
 
   // LOGIN / SIGNUP
@@ -101,12 +108,21 @@ function App() {
 
       <Sidebar
         page={activePage}
-        setPage={setActivePage}
-        mobileOpen={false}
-        closeMobile={() => {}}
+        setPage={handlePageChange}
+        mobileOpen={mobileMenuOpen}
+        closeMobile={() => setMobileMenuOpen(false)}
       />
 
       <main className="main">
+
+        <button
+          className="menu-btn"
+          type="button"
+          onClick={() => setMobileMenuOpen(true)}
+          aria-label="Open navigation menu"
+        >
+          <Menu size={20} />
+        </button>
 
         {/* USER / LOGOUT */}
         <div
@@ -127,7 +143,7 @@ function App() {
               fontWeight: 600,
             }}
           >
-            {currentUser.userId}
+            {currentUser.userId || currentUser.email}
           </span>
 
           <button

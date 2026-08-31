@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { supabase } from "../auth/supabaseClient";
+import { Eye, EyeOff, LockKeyhole, Mail, Sparkles } from "lucide-react";
 
 export default function LoginPage({ onLogin, onSignup }) {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -34,45 +36,37 @@ export default function LoginPage({ onLogin, onSignup }) {
 
   return (
     <div className="auth-page">
-      <div className="auth-card">
+      <div className="auth-shell">
+        <aside className="auth-showcase" aria-hidden="true">
+          <div className="auth-logo">CAT<span>LY</span></div>
+          <div className="auth-showcase-copy">
+            <span className="auth-kicker"><Sparkles size={14} /> CAT 2026 command centre</span>
+            <h2>Prepare with<br />a clear head.</h2>
+            <p>Keep your plan, progress, targets, and motivation in one focused space.</p>
+          </div>
+          <div className="auth-quote">“Small, consistent steps create remarkable results.”</div>
+        </aside>
 
-        <div className="auth-logo">
-          CAT<span>LY</span>
-        </div>
-
-        <p className="auth-subtitle">
-          Your CAT 2026 command centre.
-        </p>
-
-        <h1>Welcome back.</h1>
-
-        <p className="auth-description">
-          Log in to continue your CAT journey.
-        </p>
+        <div className="auth-card">
+          <div className="auth-mobile-brand auth-logo">CAT<span>LY</span></div>
+          <span className="auth-kicker"><Sparkles size={14} /> Welcome back</span>
+          <h1>Sign in to continue.</h1>
+          <p className="auth-description">Pick up exactly where you left off in your CAT journey.</p>
 
         <form onSubmit={handleSubmit}>
 
-          <label>CAT User ID</label>
+          <label htmlFor="login-user-id">CAT User ID</label>
+          <div className="auth-input-wrap">
+            <Mail size={18} aria-hidden="true" />
+            <input id="login-user-id" type="text" placeholder="Enter your CAT User ID" value={userId} onChange={(e) => setUserId(e.target.value)} autoComplete="username" required />
+          </div>
 
-          <input
-            type="text"
-            placeholder="Enter your CAT User ID"
-            value={userId}
-            onChange={(e) => setUserId(e.target.value)}
-            autoComplete="username"
-            required
-          />
-
-          <label>Password</label>
-
-          <input
-            type="password"
-            placeholder="Enter your password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete="current-password"
-            required
-          />
+          <label htmlFor="login-password">Password</label>
+          <div className="auth-input-wrap">
+            <LockKeyhole size={18} aria-hidden="true" />
+            <input id="login-password" type={showPassword ? "text" : "password"} placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required />
+            <button className="password-toggle" type="button" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? "Hide password" : "Show password"}>{showPassword ? <EyeOff size={18} /> : <Eye size={18} />}</button>
+          </div>
 
           {error && (
             <div className="auth-error">
@@ -98,6 +92,7 @@ export default function LoginPage({ onLogin, onSignup }) {
           CREATE ACCOUNT
         </button>
 
+        </div>
       </div>
     </div>
   );

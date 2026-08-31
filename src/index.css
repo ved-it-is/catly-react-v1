@@ -1903,6 +1903,152 @@ tr:hover td {
   line-height: 1.5;
 }
 
+/* A focused two-panel authentication experience that collapses cleanly on small screens. */
+.auth-page {
+  min-height: 100dvh;
+  padding: clamp(16px, 3vw, 48px);
+  background:
+    radial-gradient(circle at 12% 8%, rgba(110, 75, 230, 0.28), transparent 30%),
+    radial-gradient(circle at 88% 92%, rgba(40, 189, 232, 0.14), transparent 28%),
+    #070910;
+}
+
+.auth-shell {
+  display: grid;
+  grid-template-columns: minmax(300px, 0.95fr) minmax(360px, 0.8fr);
+  width: min(100%, 980px);
+  overflow: hidden;
+  border: 1px solid rgba(156, 163, 175, 0.18);
+  border-radius: 28px;
+  background: #0e111a;
+  box-shadow: 0 32px 100px rgba(0, 0, 0, 0.5);
+}
+
+.auth-showcase {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 610px;
+  padding: 44px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 90% 10%, rgba(99, 102, 241, 0.48), transparent 38%),
+    radial-gradient(circle at 10% 94%, rgba(56, 189, 248, 0.18), transparent 34%),
+    linear-gradient(145deg, #1d1740, #11182b 64%, #0d1420);
+}
+
+.auth-showcase::after {
+  content: "";
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  right: -175px;
+  bottom: -150px;
+  border: 1px solid rgba(196, 181, 253, 0.3);
+  border-radius: 50%;
+  box-shadow: 0 0 0 38px rgba(167, 139, 250, 0.05), 0 0 0 76px rgba(167, 139, 250, 0.035);
+}
+
+.auth-showcase-copy {
+  position: relative;
+  z-index: 1;
+  margin: auto 0;
+}
+
+.auth-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 17px;
+  color: #b9a7f7;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+}
+
+.auth-showcase h2 {
+  margin: 0 0 16px;
+  color: #fff;
+  font-size: clamp(36px, 4vw, 51px);
+  line-height: 1.02;
+  letter-spacing: -2px;
+}
+
+.auth-showcase-copy p {
+  max-width: 330px;
+  margin: 0;
+  color: #bac2d5;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.auth-quote {
+  position: relative;
+  z-index: 1;
+  max-width: 290px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(224, 231, 255, 0.18);
+  color: #d7dcef;
+  font-size: 13px;
+  font-style: italic;
+  line-height: 1.55;
+}
+
+.auth-card {
+  align-self: center;
+  max-width: none;
+  padding: clamp(34px, 5vw, 60px);
+  border: 0;
+  border-radius: 0;
+  background: #0e111a;
+  box-shadow: none;
+}
+
+.auth-card > .auth-kicker { color: #a78bfa; }
+.auth-card h1 { font-size: clamp(28px, 3vw, 34px); line-height: 1.15; }
+.auth-description { margin-bottom: 26px; line-height: 1.6; }
+.auth-mobile-brand { display: none; }
+.auth-card label { margin-top: 16px; }
+
+.auth-input-wrap {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border: 1px solid #2a3042;
+  border-radius: 11px;
+  background: #080b12;
+  color: #69758e;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-input-wrap:focus-within {
+  border-color: #8b5cf6;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
+}
+
+.auth-input-wrap > svg { flex: 0 0 auto; margin-left: 14px; }
+.auth-card .auth-input-wrap input { min-width: 0; padding-left: 11px; border: 0; box-shadow: none; }
+.password-toggle {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-right: 3px;
+  border: 0;
+  background: transparent;
+  color: #7b879e;
+}
+.password-toggle:hover { color: #d8ddeb; }
+.auth-button { margin-top: 25px; box-shadow: 0 10px 25px rgba(107, 75, 220, 0.24); transition: transform 0.2s ease, filter 0.2s ease; }
+.auth-button:hover:not(:disabled) { transform: translateY(-1px); }
+.auth-button:disabled { cursor: wait; opacity: 0.72; }
+.auth-divider { display: flex; align-items: center; gap: 12px; margin: 27px 0 16px; color: #68738a; font-size: 10px; font-weight: 800; letter-spacing: 0.9px; }
+.auth-divider::before, .auth-divider::after { content: ""; flex: 1; height: 1px; background: #252b39; }
+.auth-secondary-button { width: 100%; min-height: 46px; border: 1px solid #363e52; border-radius: 11px; background: transparent; color: #d9ddea; font-size: 13px; font-weight: 800; letter-spacing: 0.35px; transition: 0.2s ease; }
+.auth-secondary-button:hover { border-color: #7560b6; background: #171b29; }
+
 
 /* =========================================================
    MOBILE
@@ -1915,6 +2061,11 @@ tr:hover td {
 @media (max-width: 1200px) {
   .sidebar {
     width: 240px;
+  }
+
+  .main {
+    width: calc(100% - 240px);
+    margin-left: 240px;
   }
 
   .page-content {
@@ -2029,6 +2180,28 @@ tr:hover td {
   .main {
     width: 100%;
     min-width: 0;
+    margin-left: 0;
+  }
+
+  .menu-btn {
+    position: fixed;
+    top: 18px;
+    left: 18px;
+    z-index: 80;
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border: 1px solid #30384b;
+    border-radius: 11px;
+    background: rgba(17, 21, 31, 0.96);
+    color: #e3e7f0;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  }
+
+  .main > div[style] {
+    top: 18px !important;
+    right: 18px !important;
   }
 
   .page-content {
@@ -2105,7 +2278,7 @@ tr:hover td {
 
 @media (max-width: 520px) {
   .page-content {
-    padding: 22px 16px 45px;
+    padding: 78px 16px 45px;
   }
 
   .hero {
@@ -2176,16 +2349,30 @@ tr:hover td {
     font-size: 38px;
   }
 
-  .auth-card {
-    padding: 30px 22px;
-  }
-
   .target-result {
     font-size: 54px;
   }
 
   .cat-watch-heading h1 {
   font-size: 32px;
+}
+
+@media (max-width: 760px) {
+  .auth-page { align-items: stretch; padding: 16px; }
+  .auth-shell { display: block; border-radius: 22px; }
+  .auth-showcase { display: none; }
+  .auth-card { padding: 32px 24px; }
+  .auth-mobile-brand { display: block; margin-bottom: 30px; font-size: 32px; }
+  .auth-card h1 { font-size: 29px; }
+}
+
+@media (max-width: 440px) {
+  .main > div[style] span { display: none; }
+  .main > div[style] button { padding: 8px 10px !important; }
+  .auth-page { padding: 0; }
+  .auth-shell { min-height: 100dvh; border-width: 0; border-radius: 0; }
+  .auth-card { padding: 28px 20px; }
+  .auth-mobile-brand { margin-bottom: 26px; }
 }
 
 .featured-thumbnail {
