@@ -3506,3 +3506,15 @@ tr:hover td {
 .countdown-full .muted {
   margin-top: 20px !important;
 }
+
+@media (min-width: 901px) {
+  .main > div[style] {
+    top: 24px !important;
+    right: 32px !important;
+    gap: 16px !important;
+  }
+
+  .page-content:not(.page-content--full-bleed) {
+    padding-top: 100px;
+  }
+}
