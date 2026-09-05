@@ -7,12 +7,14 @@ export default function SignupPage({ onSignup, onLogin }) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
+    setMessage("");
 
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
@@ -41,8 +43,10 @@ export default function SignupPage({ onSignup, onLogin }) {
         { id: data.user.id, email: data.user.email }
       ]);
 
-      if (onSignup) {
-        onSignup(data.user);
+      if (data.session?.user && onSignup) {
+        onSignup(data.session.user);
+      } else {
+        setMessage("Your account is ready. Please confirm your email, then sign in.");
       }
     }
 
@@ -82,6 +86,12 @@ export default function SignupPage({ onSignup, onLogin }) {
           {error && (
             <div className="auth-error">
               {error}
+            </div>
+          )}
+
+          {message && (
+            <div className="auth-error">
+              {message}
             </div>
           )}
 

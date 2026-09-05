@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
 
 import Sidebar from "./components/Sidebar";
@@ -13,19 +13,38 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import { CAT_EXAM_DATE } from "./data/catData";
 
-import {
-  getCurrentUser,
-  logout,
-} from "./auth/auth";
+import { supabase } from "./auth/supabaseClient";
 
 function App() {
-  const [currentUser, setCurrentUser] = useState(
-    getCurrentUser()
-  );
+  const [currentUser, setCurrentUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
 
   const [authPage, setAuthPage] = useState("login");
   const [activePage, setActivePage] = useState("dashboard");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (mounted) {
+        setCurrentUser(session?.user ?? null);
+        setAuthLoading(false);
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setCurrentUser(session?.user ?? null);
+        setAuthLoading(false);
+      }
+    );
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
 
   function handleLogin(user) {
     setCurrentUser(user);
@@ -37,8 +56,8 @@ function App() {
     setActivePage("dashboard");
   }
 
-  function handleLogout() {
-    logout();
+  async function handleLogout() {
+    await supabase.auth.signOut();
     setCurrentUser(null);
     setAuthPage("login");
   }
@@ -46,6 +65,10 @@ function App() {
   function handlePageChange(page) {
     setActivePage(page);
     setMobileMenuOpen(false);
+  }
+
+  if (authLoading) {
+    return <div className="auth-page">Loading your account…</div>;
   }
 
   // LOGIN / SIGNUP
