@@ -17,6 +17,12 @@ Open the Vite URL shown in the terminal.
 npm run build
 ```
 
+## Supabase schedule setup
+
+Run `supabase/migrations/20260906_create_schedule_tasks.sql` once in the Supabase SQL Editor. It creates the secure database table used by the **Today's Schedule** section of the Planner page.
+
+Schedule tasks are stored under the signed-in user's account, so they stay available after refresh and on other devices.
+
 ## Current status
 
 - React + Vite
