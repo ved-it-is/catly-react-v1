@@ -3256,6 +3256,23 @@ tr:hover td {
   margin: 34px auto 0;
 }
 
+.reminders-page {
+  display: flex;
+  flex-direction: column;
+}
+
+.reminders-header {
+  order: 1;
+}
+
+.planner-reminders {
+  order: 2;
+}
+
+.planner-section:not(.planner-reminders) {
+  order: 3;
+}
+
 .planner-section-heading {
   display: flex;
   align-items: flex-end;
@@ -3386,6 +3403,13 @@ tr:hover td {
   background: #121722;
 }
 
+.schedule-task-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
 .schedule-task b {
   display: block;
   color: #eef1f7;
@@ -3420,6 +3444,26 @@ tr:hover td {
   border-color: #356b54;
   background: rgba(38, 90, 66, 0.35);
   color: #a6e5be;
+}
+
+.task-delete-button {
+  padding: 10px 12px;
+  border: 1px solid #5b3340;
+  border-radius: 9px;
+  background: transparent;
+  color: #e7a7b4;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.task-delete-button:hover:not(:disabled) {
+  border-color: #a34d60;
+  background: rgba(104, 39, 56, 0.24);
+}
+
+.task-delete-button:disabled {
+  cursor: wait;
+  opacity: 0.65;
 }
 
 .planner-reminders {
@@ -3464,6 +3508,10 @@ tr:hover td {
   .schedule-task {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .schedule-task-actions {
+    justify-content: flex-end;
   }
 }
 

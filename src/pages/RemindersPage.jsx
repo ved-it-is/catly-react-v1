@@ -65,6 +65,7 @@ export default function RemindersPage({ user }) {
   const [customTask, setCustomTask] = useState("");
   const [savingTask, setSavingTask] = useState(false);
   const [updatingTaskId, setUpdatingTaskId] = useState(null);
+  const [deletingTaskId, setDeletingTaskId] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -222,7 +223,7 @@ export default function RemindersPage({ user }) {
   }
 
   async function toggleTaskStatus(task) {
-    if (updatingTaskId) return;
+    if (updatingTaskId || deletingTaskId) return;
     const nextStatus = task.status === "completed" ? "pending" : "completed";
     setUpdatingTaskId(task.id);
     setScheduleError("");
@@ -245,6 +246,22 @@ export default function RemindersPage({ user }) {
 
     const savedTask = toScheduleTask(data);
     setScheduleTasks((current) => current.map((item) => item.id === task.id ? savedTask : item));
+  }
+
+  async function deleteScheduleTask(task) {
+    if (deletingTaskId || !window.confirm(`Delete “${task.title}” from your schedule?`)) return;
+
+    setDeletingTaskId(task.id);
+    setScheduleError("");
+    const { error } = await supabase.from("schedule_tasks").delete().eq("id", task.id);
+    setDeletingTaskId(null);
+
+    if (error) {
+      setScheduleError("We could not delete this task. Please run the new Supabase SQL setup, then try again.");
+      return;
+    }
+
+    setScheduleTasks((current) => current.filter((item) => item.id !== task.id));
   }
 
   function handleCustomTaskSubmit(event) {
@@ -315,14 +332,24 @@ export default function RemindersPage({ user }) {
                 <span className="schedule-status">{task.status === "completed" ? "Completed" : "Pending"}</span>
                 <b>{task.title}</b>
               </div>
-              <button
-                type="button"
-                className="task-status-button"
-                onClick={() => toggleTaskStatus(task)}
-                disabled={updatingTaskId === task.id}
-              >
-                {updatingTaskId === task.id ? "Saving…" : task.status === "completed" ? "Mark pending" : "Mark completed"}
-              </button>
+              <div className="schedule-task-actions">
+                <button
+                  type="button"
+                  className="task-status-button"
+                  onClick={() => toggleTaskStatus(task)}
+                  disabled={updatingTaskId === task.id || deletingTaskId === task.id}
+                >
+                  {updatingTaskId === task.id ? "Saving…" : task.status === "completed" ? "Mark pending" : "Mark completed"}
+                </button>
+                <button
+                  type="button"
+                  className="task-delete-button"
+                  onClick={() => deleteScheduleTask(task)}
+                  disabled={deletingTaskId === task.id || updatingTaskId === task.id}
+                >
+                  {deletingTaskId === task.id ? "Deleting…" : "Delete"}
+                </button>
+              </div>
             </article>
           ))}
         </div>
