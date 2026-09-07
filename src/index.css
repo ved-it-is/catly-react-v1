@@ -920,6 +920,17 @@ tr:hover td {
   background: rgba(139, 92, 246, 0.025);
 }
 
+.topic-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.analytics-footnote {
+  margin-top: 14px;
+  line-height: 1.6;
+}
+
 .mini-bar {
   max-width: 160px;
 
