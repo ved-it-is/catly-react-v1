@@ -1,12 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import CountdownWidget from "../components/CountdownWidget";
 import StatCard from "../components/StatCard";
 import { topicCoverage } from "../data/catData";
 import { calculateReadiness } from "../utils/readiness";
-
-function getReadinessKey(user) {
-  return `catly_readiness_${user?.userId || "guest"}`;
-}
 
 function getRandomTopic(section) {
   const topics = Object.keys(topicCoverage[section] || {});
@@ -20,9 +16,12 @@ const topicDescriptions = {
   DILR: "Work on set-selection technique and reducing setup time.",
 };
 
-export default function DashboardPage({ examDate, user }) {
-  const [targetPercentile, setTargetPercentile] = useState("95.0");
-  const [readinessPercent, setReadinessPercent] = useState(0);
+export default function DashboardPage({ examDate, readinessProfile }) {
+  const { targetPercentile, readiness, loading, error } = readinessProfile;
+  const readinessPercent = useMemo(
+    () => calculateReadiness(readiness).readinessIndex || 0,
+    [readiness]
+  );
   const [randomFocus, setRandomFocus] = useState({
     QA: "Arithmetic",
     VARC: "Reading Comprehension",
@@ -30,34 +29,12 @@ export default function DashboardPage({ examDate, user }) {
   });
 
   useEffect(() => {
-    // 1. Fetch saved Target Percentile
-    const savedTarget = localStorage.getItem("catly_target_percentile");
-    if (savedTarget) {
-      setTargetPercentile(Number(savedTarget).toFixed(1));
-    }
-
-    // 2. Fetch readiness index dynamically from user readiness data
-    try {
-      const savedReadiness = JSON.parse(
-        localStorage.getItem(getReadinessKey(user)) || "null"
-      );
-      if (savedReadiness) {
-        const result = calculateReadiness(savedReadiness);
-        setReadinessPercent(result.readinessIndex || 0);
-      } else {
-        setReadinessPercent(0);
-      }
-    } catch {
-      setReadinessPercent(0);
-    }
-
-    // 3. Pick random topics for Today's Focus
     setRandomFocus({
       QA: getRandomTopic("QA"),
       VARC: getRandomTopic("VARC"),
       DILR: getRandomTopic("DILR"),
     });
-  }, [user]);
+  }, []);
 
   return (
     <div className="dashboard-page" style={{ position: "relative" }}>
@@ -92,6 +69,7 @@ export default function DashboardPage({ examDate, user }) {
       />
 
       <div style={{ position: "relative", zIndex: 1 }}>
+        {error && <p className="form-error" role="alert">{error}</p>}
         <section className="hero">
           <div>
             <CountdownWidget examDate={examDate} />
@@ -116,7 +94,7 @@ export default function DashboardPage({ examDate, user }) {
           <div style={{ width: "100%", maxWidth: "360px" }}>
             <StatCard
               label="TARGET PERCENTILE"
-              value={targetPercentile}
+              value={loading ? "—" : Number(targetPercentile).toFixed(1)}
               sub="Your current goal"
             />
           </div>

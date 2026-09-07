@@ -1,67 +1,21 @@
-import {
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { useMemo } from "react";
 
-import {
-  calculateReadiness,
-  createEmptyReadiness,
-} from "../utils/readiness";
-
-function getReadinessKey(user) {
-  return `catly_readiness_${user?.userId || "guest"}`;
-}
-
-function loadReadiness(user) {
-  const emptyReadiness = createEmptyReadiness();
-
-  try {
-    const savedReadiness = JSON.parse(
-      localStorage.getItem(getReadinessKey(user)) || "null"
-    );
-
-    if (!savedReadiness) {
-      return emptyReadiness;
-    }
-
-    Object.keys(emptyReadiness).forEach((section) => {
-      Object.keys(emptyReadiness[section]).forEach((topic) => {
-        emptyReadiness[section][topic] = {
-          ...emptyReadiness[section][topic],
-          ...(savedReadiness?.[section]?.[topic] || {}),
-        };
-      });
-    });
-
-    return emptyReadiness;
-  } catch {
-    return emptyReadiness;
-  }
-}
+import { calculateReadiness } from "../utils/readiness";
 
 const sectionOrder = ["QA", "DILR", "VARC"];
 
-export default function TargetPage({ user }) {
-  const [target, setTarget] = useState(() => {
-    const savedTarget = localStorage.getItem("catly_target_percentile");
-    return savedTarget ? Number(savedTarget) : 95;
-  });
-
-  const [readiness, setReadiness] = useState(() =>
-    loadReadiness(user)
-  );
-
-  useEffect(() => {
-    localStorage.setItem("catly_target_percentile", target.toString());
-  }, [target]);
-
-  useEffect(() => {
-    localStorage.setItem(
-      getReadinessKey(user),
-      JSON.stringify(readiness)
-    );
-  }, [readiness, user]);
+export default function TargetPage({ readinessProfile }) {
+  const {
+    targetPercentile: target,
+    setTargetPercentile: setTarget,
+    readiness,
+    setReadiness,
+    resetReadiness: clearReadiness,
+    loading,
+    saving,
+    error,
+  } = readinessProfile;
+  const controlsDisabled = loading || Boolean(error);
 
   const result = useMemo(() => {
     return calculateReadiness(readiness);
@@ -100,7 +54,7 @@ export default function TargetPage({ user }) {
 
     if (!confirmed) return;
 
-    setReadiness(createEmptyReadiness());
+    clearReadiness();
   }
 
   return (
@@ -114,6 +68,11 @@ export default function TargetPage({ user }) {
           Build a goal and track the preparation behind it.
         </div>
       </div>
+
+      {error && <p className="form-error" role="alert">{error}</p>}
+      {!error && (loading || saving) && (
+        <p className="muted" aria-live="polite">{loading ? "Loading your readiness…" : "Saving changes…"}</p>
+      )}
 
       {/* TARGET PERCENTILE */}
       <div className="card section-gap target-card">
@@ -160,6 +119,7 @@ export default function TargetPage({ user }) {
                 setTarget(Number(event.target.value))
               }
               aria-label="Target percentile"
+              disabled={controlsDisabled}
             />
 
             <div className="range-labels">
@@ -250,6 +210,7 @@ export default function TargetPage({ user }) {
           <button
             className="readiness-reset"
             onClick={resetReadiness}
+            disabled={controlsDisabled}
           >
             Reset check-in
           </button>
@@ -298,6 +259,7 @@ export default function TargetPage({ user }) {
                               event.target.value
                             )
                           }
+                          disabled={controlsDisabled}
                         >
                           <option value="not-started">
                             Not started
@@ -332,6 +294,7 @@ export default function TargetPage({ user }) {
                               event.target.value
                             )
                           }
+                          disabled={controlsDisabled}
                         />
                       </label>
 
@@ -351,6 +314,7 @@ export default function TargetPage({ user }) {
                               event.target.value
                             )
                           }
+                          disabled={controlsDisabled}
                         />
                       </label>
                     </div>

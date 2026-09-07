@@ -23,6 +23,12 @@ Run `supabase/migrations/20260906_create_schedule_tasks.sql` once in the Supabas
 
 Schedule tasks are stored under the signed-in user's account, so they stay available after refresh and on other devices.
 
+## Supabase readiness setup
+
+Run `supabase/migrations/20260907_create_user_readiness.sql` once in the Supabase SQL Editor. It creates the secure account-scoped storage used by the **My Target** readiness check and Dashboard.
+
+On the first successful load, an existing browser-only readiness check is imported into the signed-in account and the legacy browser copy is removed.
+
 ## Current status
 
 - React + Vite

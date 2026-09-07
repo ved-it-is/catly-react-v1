@@ -39,9 +39,15 @@ export default function SignupPage({ onSignup, onLogin }) {
 
     if (data?.user) {
       // Create profile row in user_profiles table
-      await supabase.from("user_profiles").insert([
+      const { error: profileError } = await supabase.from("user_profiles").upsert([
         { id: data.user.id, email: data.user.email }
       ]);
+
+      if (profileError && data.session) {
+        setError("Your account was created, but we could not finish setting up your profile. Please sign in and try again.");
+        setLoading(false);
+        return;
+      }
 
       if (data.session?.user && onSignup) {
         onSignup(data.session.user);

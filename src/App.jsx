@@ -14,6 +14,7 @@ import SignupPage from "./pages/SignupPage";
 import { CAT_EXAM_DATE } from "./data/catData";
 
 import { supabase } from "./auth/supabaseClient";
+import { useReadinessProfile } from "./hooks/useReadinessProfile";
 
 function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -22,6 +23,7 @@ function App() {
   const [authPage, setAuthPage] = useState("login");
   const [activePage, setActivePage] = useState("dashboard");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const readinessProfile = useReadinessProfile(currentUser);
 
   useEffect(() => {
     let mounted = true;
@@ -107,7 +109,7 @@ function App() {
         return <MotivationPage user={currentUser} />;
 
       case "target":
-        return <TargetPage user={currentUser} />;
+        return <TargetPage readinessProfile={readinessProfile} />;
 
       case "mock":
         return <CatWatchPage user={currentUser} />;
@@ -119,8 +121,8 @@ function App() {
       default:
         return (
           <DashboardPage
-            user={currentUser}
             examDate={CAT_EXAM_DATE}
+            readinessProfile={readinessProfile}
           />
         );
     }

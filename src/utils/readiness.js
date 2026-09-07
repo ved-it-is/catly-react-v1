@@ -22,21 +22,22 @@ const PRACTICE_TARGETS = {
     Algebra: 200,
     "Geometry & Mensuration": 140,
     "Number System": 90,
-    "Modern Mathematics": 90,
+    "Modern Math": 90,
   },
 
   VARC: {
     "Reading Comprehension": 240,
     "Para Jumbles": 80,
     "Para Summary": 80,
-    "Para Completion": 80,
-    "Odd Sentence": 60,
+    "Sentence Insertion": 80,
+    "Odd Sentence Out": 60,
+    "Other Verbal Ability": 40,
   },
 
   DILR: {
-    "Data Interpretation": 180,
-    "Logical Reasoning": 220,
-    "Mixed DI-LR / Caselets": 100,
+    "Questions in 4-question sets": 160,
+    "Questions in 5-question sets": 200,
+    "Questions in 6-question sets": 120,
   },
 };
 
@@ -230,4 +231,19 @@ export function calculateReadiness(readiness) {
     totalTopics,
     questionsAttempted,
   };
+}
+
+export function mergeReadiness(savedReadiness) {
+  const merged = createEmptyReadiness();
+
+  Object.keys(merged).forEach((section) => {
+    Object.keys(merged[section]).forEach((topic) => {
+      merged[section][topic] = {
+        ...merged[section][topic],
+        ...(savedReadiness?.[section]?.[topic] || {}),
+      };
+    });
+  });
+
+  return merged;
 }
