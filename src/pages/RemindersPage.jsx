@@ -12,6 +12,23 @@ const SCHEDULE_OPTIONS = [
   { title: "Revision", detail: "Revise formulas, concepts or notes" },
 ];
 
+const LOAD_RETRY_DELAY_MS = 500;
+
+function wait(milliseconds) {
+  return new Promise((resolve) => window.setTimeout(resolve, milliseconds));
+}
+
+async function queryWithRetry(createQuery) {
+  let result = await createQuery();
+
+  if (result.error) {
+    await wait(LOAD_RETRY_DELAY_MS);
+    result = await createQuery();
+  }
+
+  return result;
+}
+
 function getToday() {
   return new Date().toISOString().split("T")[0];
 }
@@ -83,15 +100,30 @@ export default function RemindersPage({ user }) {
       setReminderError("");
       setScheduleError("");
 
+      // The auth event can render this page just before Supabase has finished
+      // restoring the persisted session. Ensure the client has its session
+      // before making the first database requests.
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (cancelled) return;
+
+      if (sessionError || sessionData.session?.user?.id !== user.id) {
+        setReminderError("Your session is not ready. Please sign in again.");
+        setScheduleError("Your session is not ready. Please sign in again.");
+        setLoading(false);
+        return;
+      }
+
       const [reminderResult, scheduleResult] = await Promise.all([
-        supabase
+        queryWithRetry(() => supabase
           .from("reminders")
           .select("id, title, description, reminder_date, color")
-          .order("reminder_date", { ascending: true, nullsFirst: false }),
-        supabase
+          .eq("user_id", user.id)
+          .order("reminder_date", { ascending: true, nullsFirst: false })),
+        queryWithRetry(() => supabase
           .from("schedule_tasks")
           .select("id, title, status, created_at")
-          .order("created_at", { ascending: true }),
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: true })),
       ]);
 
       if (cancelled) return;
@@ -103,7 +135,7 @@ export default function RemindersPage({ user }) {
       }
 
       if (scheduleResult.error) {
-        setScheduleError("We could not load your schedule. Please run the new Supabase SQL setup, then refresh.");
+        setScheduleError("We could not load your schedule. Please try again in a moment.");
       } else {
         setScheduleTasks(scheduleResult.data.map(toScheduleTask));
       }
@@ -170,7 +202,7 @@ export default function RemindersPage({ user }) {
       color,
     };
     const request = editingId
-      ? supabase.from("reminders").update(values).eq("id", editingId)
+      ? supabase.from("reminders").update(values).eq("id", editingId).eq("user_id", user.id)
           .select("id, title, description, reminder_date, color").single()
       : supabase.from("reminders").insert({ ...values, user_id: user.id })
           .select("id, title, description, reminder_date, color").single();
@@ -193,7 +225,7 @@ export default function RemindersPage({ user }) {
     if (!window.confirm("Delete this reminder?")) return;
     const previousReminders = reminders;
     setReminders((current) => current.filter((reminder) => reminder.id !== id));
-    const { error } = await supabase.from("reminders").delete().eq("id", id);
+    const { error } = await supabase.from("reminders").delete().eq("id", id).eq("user_id", user.id);
     if (error) {
       setReminders(previousReminders);
       setReminderError("We could not delete this reminder. Please try again.");
@@ -235,6 +267,7 @@ export default function RemindersPage({ user }) {
         completed_at: nextStatus === "completed" ? new Date().toISOString() : null,
       })
       .eq("id", task.id)
+      .eq("user_id", user.id)
       .select("id, title, status, created_at")
       .single();
     setUpdatingTaskId(null);
@@ -253,7 +286,7 @@ export default function RemindersPage({ user }) {
 
     setDeletingTaskId(task.id);
     setScheduleError("");
-    const { error } = await supabase.from("schedule_tasks").delete().eq("id", task.id);
+    const { error } = await supabase.from("schedule_tasks").delete().eq("id", task.id).eq("user_id", user.id);
     setDeletingTaskId(null);
 
     if (error) {
